@@ -1,5 +1,3 @@
-
-```js
 import { supabaseAdmin } from '../../lib/supabase'
 import { Resend } from 'resend'
 
@@ -41,4 +39,3 @@ export default async function handler(req, res) {
 
   res.status(200).json({ surveyUrl, resultsUrl })
 }
-```

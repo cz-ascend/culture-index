@@ -1,5 +1,3 @@
-
-```jsx
 import { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { ROLES } from '../lib/data'
@@ -16,17 +14,17 @@ export default function AdminPage() {
   const [err, setErr] = useState('')
 
   if (!authed) return (
-    
-      
-        Culture Index
-        Admin access
+    <div style={S.page}>
+      <div style={S.card}>
+        <h1 style={S.h1}>Culture Index</h1>
+        <p style={S.sub}>Admin access</p>
         <input style={S.input} type="password" placeholder="Enter admin PIN"
           value={pin} onChange={e => { setPin(e.target.value); setPinErr(false) }}
           onKeyDown={e => e.key === 'Enter' && (pin === PIN ? setAuthed(true) : setPinErr(true))} />
-        <button style={S.btn} onClick={() => pin === PIN ? setAuthed(true) : setPinErr(true)}>Enter
-        {pinErr && Incorrect PIN}
-      
-    
+        <button style={S.btn} onClick={() => pin === PIN ? setAuthed(true) : setPinErr(true)}>Enter</button>
+        {pinErr && <p style={S.err}>Incorrect PIN</p>}
+      </div>
+    </div>
   )
 
   const create = async () => {
@@ -45,50 +43,48 @@ export default function AdminPage() {
   }
 
   return (
-    
-      
-        Culture Index — Admin
-        Create a unique survey link for each candidate
-        Candidate Name
+    <div style={S.page}>
+      <div style={{ ...S.card, maxWidth: 520 }}>
+        <h1 style={S.h1}>Culture Index — Admin</h1>
+        <p style={S.sub}>Create a unique survey link for each candidate</p>
+        <label style={S.label}>Candidate Name</label>
         <input style={S.input} placeholder="e.g. Jane Smith" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-        Candidate Email
+        <label style={S.label}>Candidate Email</label>
         <input style={S.input} type="email" placeholder="jane@example.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
-        Your Email (results sent here)
+        <label style={S.label}>Your Email (results sent here)</label>
         <input style={S.input} type="email" placeholder="you@yourfirm.com" value={form.adminEmail} onChange={e => setForm({ ...form, adminEmail: e.target.value })} />
-        Target Role
-        
+        <label style={S.label}>Target Role</label>
+        <div style={{ marginBottom: 20 }}>
           {Object.entries(ROLES).map(([k, r]) => (
             <button key={k} onClick={() => setForm({ ...form, role: k })}
               style={{ ...S.roleBtn, ...(form.role === k ? S.roleBtnActive : {}) }}>
               {r.icon} {r.label}
-            
+            </button>
           ))}
-        
-        
+        </div>
+        <button style={S.btn} onClick={create} disabled={loading}>
           {loading ? 'Creating...' : 'Create Survey Link →'}
-        
-        {err && {err}}
+        </button>
+        {err && <p style={S.err}>{err}</p>}
         {result && (
-          
-            ✅ Survey created!
-            {result.surveyUrl}
-            An invite email has been sent to the candidate. You'll receive the results link when they complete the survey.
-            
+          <div style={S.success}>
+            <p style={{ fontWeight: 700, marginBottom: 8 }}>✅ Survey created!</p>
+            <p style={{ fontSize: 13, marginBottom: 12, wordBreak: 'break-all' }}>{result.surveyUrl}</p>
+            <p style={{ fontSize: 13, color: '#374151', marginBottom: 12 }}>An invite email has been sent to the candidate. You'll receive the results link when they complete the survey.</p>
+            <div style={{ display: 'flex', gap: 10 }}>
               <button style={{ ...S.btn, flex: 1, background: '#059669', padding: '8px 0', fontSize: 13 }}
-                onClick={() => navigator.clipboard.writeText(result.surveyUrl)}>Copy Survey Link
+                onClick={() => navigator.clipboard.writeText(result.surveyUrl)}>Copy Survey Link</button>
               <button style={{ ...S.btn, flex: 1, background: '#1e3a5f', padding: '8px 0', fontSize: 13 }}
-                onClick={() => window.open(result.resultsUrl)}>Preview Results Page
-            
-          
+                onClick={() => window.open(result.resultsUrl)}>Preview Results Page</button>
+            </div>
+          </div>
         )}
-        
-          <button style={{ ...S.btn, background: '#1e3a5f', fontSize: 13 }}
-            onClick={() => window.location.href = '/team'}>
-            📊 Team Comparison Dashboard →
-          
-        
-      
-    
+        <button style={{ ...S.btn, background: '#1e3a5f', fontSize: 13, marginTop: 12 }}
+          onClick={() => window.location.href = '/team'}>
+          📊 Team Comparison Dashboard →
+        </button>
+      </div>
+    </div>
   )
 }
 
@@ -105,4 +101,3 @@ const S = {
   roleBtnActive: { border: '2px solid #4f46e5', background: '#eef2ff', color: '#4f46e5', fontWeight: 700 },
   success: { marginTop: 20, padding: 16, background: '#f0fdf4', borderRadius: 10, border: '1px solid #86efac' },
 }
-```
