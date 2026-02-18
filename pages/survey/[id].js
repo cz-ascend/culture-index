@@ -1,0 +1,133 @@
+```jsx
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { supabase } from '../../lib/supabase'
+import { SECTIONS } from '../../lib/data'
+
+const RADIO_OPTIONS = [
+  { value: 0,  label: 'Strongly A' },
+  { value: 25, label: 'Leaning A'  },
+  { value: 50, label: 'Neutral'    },
+  { value: 75, label: 'Leaning B'  },
+  { value: 100,label: 'Strongly B' },
+]
+
+export default function SurveyPage() {
+  const { query } = useRouter()
+  const id = query.id
+  const [survey, setSurvey] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [secIdx, setSecIdx] = useState(0)
+  const [responses, setResponses] = useState({})
+  const [submitting, setSubmitting] = useState(false)
+  const [done, setDone] = useState(false)
+
+  useEffect(() => {
+    if (!id) return
+    supabase.from('surveys').select('id,candidate_name,status').eq('id', id).single()
+      .then(({ data }) => { setSurvey(data); if (data?.status === 'completed') setDone(true); setLoading(false) })
+  }, [id])
+
+  const sec = SECTIONS[secIdx]
+  const totalQ = SECTIONS.reduce((s, x) => s + x.questions.length, 0)
+  const answered = Object.keys(responses).length
+  const secDone = sec?.questions.every(q => responses[q.id] !== undefined)
+
+  const submit = async () => {
+    setSubmitting(true)
+    await fetch('/api/submit-survey', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, responses })
+    })
+    setDone(true)
+    setSubmitting(false)
+  }
+
+  if (loading) return Loading...
+  if (!survey) return Survey not found.
+  if (done) return (
+    
+      
+        ✅
+        Thank you, {survey.candidate_name}
+        
+          Your responses have been submitted. The team will be in touch with next steps.
+        
+      
+    
+  )
+
+  const progress = Math.round((answered / totalQ) * 100)
+
+  return (
+    
+      
+        {/* Progress */}
+        
+          
+            {sec.title} of {SECTIONS.length}
+            {answered}/{totalQ} answered
+          
+          
+            
+          
+        
+
+        {/* Questions */}
+        {sec.questions.map((q, i) => (
+          
+            
+              {i + 1}. {q.text}
+            
+            {/* Column headers */}
+            
+              {q.a}
+              {q.b}
+            
+            {/* Radio row */}
+            
+              {RADIO_OPTIONS.map(opt => {
+                const sel = responses[q.id] === opt.value
+                return (
+                  <button key={opt.value} onClick={() => setResponses(r => ({ ...r, [q.id]: opt.value }))}
+                    style={{
+                      flex: 1, padding: '10px 4px', borderRadius: 8,
+                      border: `2px solid ${sel ? '#4f46e5' : '#e5e7eb'}`,
+                      background: sel ? '#eef2ff' : 'white',
+                      cursor: 'pointer', fontSize: 11, fontWeight: sel ? 700 : 500,
+                      color: sel ? '#4f46e5' : '#6b7280', transition: 'all 0.15s',
+                      lineHeight: 1.3
+                    }}>
+                    {opt.label}
+                  
+                )
+              })}
+            
+          
+        ))}
+
+        {/* Nav */}
+        
+          <button onClick={() => { setSecIdx(s => s - 1); window.scrollTo(0, 0) }} disabled={secIdx === 0}
+            style={{ padding: '10px 24px', borderRadius: 10, border: 'none', background: '#e5e7eb', color: '#374151', fontWeight: 600, cursor: secIdx === 0 ? 'not-allowed' : 'pointer', opacity: secIdx === 0 ? 0.4 : 1 }}>
+            ← Back
+          
+          {secIdx < SECTIONS.length - 1
+            ? <button onClick={() => { setSecIdx(s => s + 1); window.scrollTo(0, 0) }} disabled={!secDone}
+                style={{ padding: '10px 24px', borderRadius: 10, border: 'none', background: secDone ? '#4f46e5' : '#d1d5db', color: 'white', fontWeight: 600, cursor: secDone ? 'pointer' : 'not-allowed' }}>
+                Next →
+              
+            : 
+                {submitting ? 'Submitting...' : 'Submit Survey ✓'}
+              
+          }
+        
+      
+    
+  )
+}
+
+function Wrap({ children }) {
+  return {children}
+}
+```
