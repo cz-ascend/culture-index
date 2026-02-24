@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   // Email candidate
   try {
     await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'noreply@hr.ascend.fo',
       to: email,
       subject: 'Your Culture Index Survey',
       html: `

@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   // Email admin
   try {
     await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'noreply@hr.ascend.fo',
       to: survey.admin_email,
       subject: `Survey completed: ${survey.candidate_name}`,
       html: `
