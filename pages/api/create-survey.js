@@ -47,7 +47,7 @@ export default async function handler(req, res) {
     try {
       const resend = new Resend(resendKey)
       const emailResult = await resend.emails.send({
-        from: 'onboarding@resend.dev',
+        from: process.env.RESEND_FROM_EMAIL,
         to: email,
         subject: 'Your Culture Index Survey',
         html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:auto;padding:32px">
